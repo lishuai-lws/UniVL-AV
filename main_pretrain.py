@@ -156,12 +156,13 @@ def init_device(args, local_rank):
 
 def init_model(args, device, n_gpu, local_rank):
 
-    if args.init_model:
+    if args.init_model:#None
         model_state_dict = torch.load(args.init_model, map_location='cpu')
     else:
         model_state_dict = None
 
     # Prepare model
+    #cache_dir = ""
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed')
     model = UniVL.from_pretrained(args.bert_model, args.visual_model, args.cross_model, args.decoder_model,
                                    cache_dir=cache_dir, state_dict=model_state_dict, task_config=args)
@@ -210,7 +211,7 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
     data_dict = pickle.load(open(args.data_path, 'rb'))
     if args.local_rank == 0:
         logger.info('Done, data_dict length: {}'.format(len(data_dict)))
-
+# todo：dataset
     dataset = Youtube_DataLoader(
         csv=args.train_csv,
         features_path=args.features_path,
@@ -362,8 +363,9 @@ def main():
     args = set_seed_logger(args)
     device, n_gpu = init_device(args, args.local_rank)
 
-    tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)#可以删除
     model = init_model(args, device, n_gpu, args.local_rank)
+    #应该不区分stage one
     only_sim = model.module._stage_one if hasattr(model, 'module') else model._stage_one
 
     train_dataloader, train_length, sampler = dataloader_pretrain(args, tokenizer, only_sim=only_sim)
