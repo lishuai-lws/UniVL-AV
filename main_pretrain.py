@@ -230,6 +230,7 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
         video_dim=args.video_dim,
     )
 
+
     sampler = torch.utils.data.distributed.DistributedSampler(dataset)
     dataloader = DataLoader(
         dataset,
