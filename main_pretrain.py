@@ -17,6 +17,7 @@ from modules.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from modules.modeling import UniVL
 from modules.optimization import BertAdam
 from dataloaders.dataloader_howto100m import Youtube_DataLoader
+from dataloaders.dataloader_emotiondata import Emotion_DataLoader
 from torch.utils.data import DataLoader
 from util import get_logger
 torch.distributed.init_process_group(backend="nccl")
@@ -229,7 +230,10 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
         pretrain_enhance_vmodal=args.pretrain_enhance_vmodal,
         video_dim=args.video_dim,
     )
-
+    dataset = Emotion_DataLoader(
+        csv=args.train_csv,
+        feature_path=args.features_path
+    )
 
     sampler = torch.utils.data.distributed.DistributedSampler(dataset)
     dataloader = DataLoader(

@@ -426,3 +426,46 @@ class UniVL(UniVLPreTrainedModel):
         _, decoder_scores_result = torch.max(decoder_scores, -1)
 
         return decoder_scores_result
+
+class AVTransModel(PreTrainedModel, nn.Module):
+    def __init__(self, audio_config, visual_config, cross_config, *inputs, **kwargs):
+        super(AVTransModel, self).__init__(audio_config)
+        self.audio_config = audio_config
+        self.visual_config = visual_config
+        self.cross_config = cross_config
+        self.audio = None
+        self.visual = None
+
+
+    @classmethod
+    def from_pretrained(cls, pretrained_audio_name, visual_model_name, cross_model_name,
+                        state_dict=None, cache_dir=None, type_vocab_size=2, *inputs, **kwargs):
+
+        task_config = None
+        if "task_config" in kwargs.keys():
+            task_config = kwargs["task_config"]
+            if not hasattr(task_config, "local_rank"):
+                task_config.__dict__["local_rank"] = 0
+            elif task_config.local_rank == -1:
+                task_config.local_rank = 0
+
+        audio_config, state_dict = AudioConfig.get_config(pretrained_audio_name, cache_dir, type_vocab_size, state_dict,
+                                                        task_config=task_config)
+        visual_config, _ = VisualConfig.get_config(visual_model_name, cache_dir, type_vocab_size, state_dict=None,
+                                                   task_config=task_config)
+        cross_config, _ = CrossConfig.get_config(cross_model_name, cache_dir, type_vocab_size, state_dict=None,
+                                                 task_config=task_config)
+
+        model = cls(audio_config, visual_config, cross_config, *inputs, **kwargs)
+
+        assert model.bert is not None
+        assert model.visual is not None
+
+        if state_dict is not None:
+            model = cls.init_preweight(model, state_dict, task_config=task_config)
+
+        return model
+
+
+class AVTrans(AVTransModel):
+    def __init__(self, audio_config, visual_config, cross_config, task_config):
