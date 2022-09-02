@@ -298,7 +298,7 @@ class AudioPredictionHeadTransform(nn.Module):
 class AudioLMPredictionHead(nn.Module):
     def __init__(self, config, audio_model_embedding_weights):
         super(AudioLMPredictionHead, self).__init__()
-        self.transform = AudioPreditionHeadTransform(config)
+        self.transform = AudioPredictionHeadTransform(config)
 
         # The output weights are the same as the input embeddings, but there is
         # an output-only bias for each token.

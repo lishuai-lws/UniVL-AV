@@ -232,7 +232,7 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
     )
     dataset = Emotion_DataLoader(
         csv=args.train_csv,
-        feature_path=args.features_path
+        features_path=args.features_path
     )
 
     sampler = torch.utils.data.distributed.DistributedSampler(dataset)

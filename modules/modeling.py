@@ -32,6 +32,7 @@ from modules.module_bert import BertModel, BertConfig, BertOnlyMLMHead
 from modules.module_visual import VisualModel, VisualConfig, VisualOnlyMLMHead
 from modules.module_cross import CrossModel, CrossConfig
 from modules.module_decoder import DecoderModel, DecoderConfig
+from modules.module_audio import AudioConfig, AudioModel, AudioOnlyMLMHead
 
 logger = logging.getLogger(__name__)
 
@@ -469,3 +470,4 @@ class AVTransModel(PreTrainedModel, nn.Module):
 
 class AVTrans(AVTransModel):
     def __init__(self, audio_config, visual_config, cross_config, task_config):
+        pass
