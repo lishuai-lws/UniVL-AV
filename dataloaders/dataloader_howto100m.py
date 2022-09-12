@@ -136,6 +136,7 @@ class Youtube_DataLoader(Dataset):
                 k = n_caption
                 r_ind = range(n_caption)
             else:
+                #不分阶段的情况下默认值为1
                 k = n_pair_max
                 if k <= n_caption:
                     r_ind = np.random.choice(range(n_caption), k, replace=False)
@@ -285,6 +286,7 @@ class Youtube_DataLoader(Dataset):
         return video_slice, start, end
 
     def _get_video(self, idx, s, e, only_sim=False):
+        #len(s)应该为1
         video_mask = np.zeros((len(s), self.max_frames), dtype=np.long)
 
         max_video_length = [0] * len(s)
