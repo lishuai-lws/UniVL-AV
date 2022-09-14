@@ -10,15 +10,22 @@ import numpy as np
 import random
 
 class Emotion_DataLoader(Dataset):
-    def __init__(self,csv,features_path,max_frames, feature_size):
+    def __init__(self,csv,features_path,max_frames, feature_size, feature_framerate):
         self.csv = pd.read_csv(csv)
         self.features_path = features_path
         self.max_frames = max_frames
         self.feature_size = feature_size
+        self.feature_framerate = feature_framerate
 
 
     def __getitem__(self, feature_idx):
-        pass
+        idx = feature_idx
+
+        video, video_mask, masked_video, video_labels_index = self._get_video(idx, np.array(0), np.array(1))
+        audio, emotion_label = self._get_audio(idx)
+
+        return audio, video, video_mask, masked_video, video_labels_index,emotion_label
+
     def _expand_video_slice(self,s,e,si,ei,fps, video_features):
         start =0
         end = len(video_features)
@@ -51,7 +58,7 @@ class Emotion_DataLoader(Dataset):
 
     def _get_video(self,idx,s,e):
 
-        feature_file = os.path.join(self.features_path, self.csv["feature_file"].values[idx])
+        feature_file = os.path.join(self.features_path, self.csv["video_feature"].values[idx])
         video_features = np.load(feature_file)
         video_length = 1
         video_mask = np.zeros((video_length, self.max_frames), dtype=np.long)
@@ -90,3 +97,9 @@ class Emotion_DataLoader(Dataset):
         # -----> Mask Frame Model
 
         return video, video_mask, masked_video, video_labels_index
+
+    def _get_audio(self, idx):
+        feature_file = os.path.join(self.features_path, self.csv["audio_feature"].values[idx])
+        audio_features = np.load(feature_file)
+        emotion_label = os.path.join(self.features_path, self.csv["emotion_label"].values[idx])
+        return audio_features,emotion_label
