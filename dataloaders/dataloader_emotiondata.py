@@ -24,7 +24,7 @@ class Emotion_DataLoader(Dataset):
         video, video_mask, masked_video, video_labels_index = self._get_video(idx, np.array(0), np.array(1))
         audio, emotion_label = self._get_audio(idx)
 
-        return audio, video, video_mask, masked_video, video_labels_index, emotion_label
+        return audio,  video, video_mask, masked_video, video_labels_index, emotion_label
 
     def _expand_video_slice(self,s,e,si,ei,fps, video_features):
         start =0
