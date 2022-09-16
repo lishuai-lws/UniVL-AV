@@ -6,7 +6,12 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 # import cv2
+import random
+from transformers import logging
 
+#修改告警显示级别
+logging.set_verbosity_error()
+from tqdm import tqdm
 
 
 
@@ -34,9 +39,8 @@ def cmumosei_data_embedding(opts):
     ids = ids.reshape(ids.shape[0], ).tolist()
     data = []
     df = pd.DataFrame(columns=["audio_feature","video_feature","emotion_label"])
-    df.to_csv(opts.csv_path)
-    for id in ids[:3]:
-        print("id:", id)
+    df.to_csv(opts.csv_path,index=False)
+    for id in tqdm(ids):
         wave_data, samplerate = librosa.load(os.path.join(audio_path, id + ".wav"), sr=16000)
         audioFeature = audio_Wav2Vec2(opts,wave_data)
         videodir = os.path.join(video_path, id + "_aligned")
@@ -55,8 +59,9 @@ def cmumosei_data_embedding(opts):
         videoFeaturePath = os.path.join(opts.feature_path,video_file)
         np.save(audioFeaturePath,audioFeature)
         np.save(videoFeaturePath,videoFeature)
-        df = pd.DataFrame([audio_file,video_file,0])
-        df.to_csv(opts.csv_path,index=False, header=False)
+        label = random.randint(0,7)#使用随机数代替标签
+        df = pd.DataFrame([[audio_file,video_file,label]])
+        df.to_csv(opts.csv_path,mode="a",index=False, header=False)
     print("cmumosei_data_embedding done")
 if __name__=="__main__":
     args = get_args()
