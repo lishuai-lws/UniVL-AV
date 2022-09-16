@@ -10,11 +10,11 @@ import numpy as np
 import random
 
 class Emotion_DataLoader(Dataset):
-    def __init__(self,csv,features_path,max_frames, feature_size, feature_framerate):
+    def __init__(self,csv,features_path,max_frames, feature_framerate, video_dim=1024):
         self.csv = pd.read_csv(csv)
         self.features_path = features_path
         self.max_frames = max_frames
-        self.feature_size = feature_size
+        self.feature_size = video_dim
         self.feature_framerate = feature_framerate
 
 

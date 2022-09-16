@@ -30,7 +30,7 @@ def get_args(description='UniVL on Pretrain'):
     parser.add_argument("--do_train", action='store_true', help="Whether to run training.")
     parser.add_argument("--do_eval", action='store_true', help="Whether to run eval on the dev set.")
 
-    parser.add_argument('--train_csv', type=str, default='data/HowTo100M_v1.csv', help='train csv')
+    parser.add_argument('--cmumosei_csv', type=str, default='data/cmumosei.csv', help='cmumosei csv')
     parser.add_argument('--features_path', type=str, default='feature', help='feature path for 2D features')
     parser.add_argument('--data_path', type=str, default='data/data.pickle', help='data pickle file path')
 
@@ -212,32 +212,36 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
     data_dict = pickle.load(open(args.data_path, 'rb'))
     if args.local_rank == 0:
         logger.info('Done, data_dict length: {}'.format(len(data_dict)))
-# todo：dataset
-    dataset = Youtube_DataLoader(
-        csv=args.train_csv,
+# dataset
+#     dataset = Youtube_DataLoader(
+#         csv=args.train_csv,
+#         features_path=args.features_path,
+#         data_dict=data_dict,
+#         min_time=args.min_time,
+#         max_words=args.max_words,
+#         min_words=args.min_words,
+#         feature_framerate=args.feature_framerate,
+#         tokenizer=tokenizer,
+#         n_pair=args.n_pair,
+#         max_frames=args.max_frames,
+#         use_mil=args.use_mil,
+#         only_sim=only_sim,
+#         sampled_use_mil=args.sampled_use_mil,
+#         pretrain_enhance_vmodal=args.pretrain_enhance_vmodal,
+#         video_dim=args.video_dim,
+#     )
+    cmumosei_dataset = Emotion_DataLoader(
+        csv=args.cmumosei_csv,
         features_path=args.features_path,
-        data_dict=data_dict,
-        min_time=args.min_time,
-        max_words=args.max_words,
-        min_words=args.min_words,
         feature_framerate=args.feature_framerate,
-        tokenizer=tokenizer,
-        n_pair=args.n_pair,
-        max_frames=args.max_frames,
-        use_mil=args.use_mil,
-        only_sim=only_sim,
-        sampled_use_mil=args.sampled_use_mil,
-        pretrain_enhance_vmodal=args.pretrain_enhance_vmodal,
-        video_dim=args.video_dim,
-    )
-    dataset = Emotion_DataLoader(
-        csv=args.train_csv,
-        features_path=args.features_path
+        max_frames=args.max_frame,
+
+
     )
 
-    sampler = torch.utils.data.distributed.DistributedSampler(dataset)
+    sampler = torch.utils.data.distributed.DistributedSampler(cmumosei_dataset)
     dataloader = DataLoader(
-        dataset,
+        cmumosei_dataset,
         batch_size=args.batch_size // args.n_gpu,
         num_workers=args.num_thread_reader,
         pin_memory=False,
@@ -246,7 +250,7 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
         drop_last=True,
     )
 
-    return dataloader, len(dataset), sampler
+    return dataloader, len(cmumosei_dataset), sampler
 
 def convert_state_dict_type(state_dict, ttype=torch.FloatTensor):
     if isinstance(state_dict, dict):
@@ -387,7 +391,7 @@ def main():
             logger.warning("Will continue to epoch: {}".format(epoch))
     epoch = 0 if epoch < 0 else epoch
 
-    coef_lr = args.coef_lr
+    coef_lr = args.coef_lr #0.1
     if args.init_model:
         coef_lr = 1.0
 
