@@ -470,4 +470,29 @@ class AVTransModel(PreTrainedModel, nn.Module):
 
 class AVTrans(AVTransModel):
     def __init__(self, audio_config, visual_config, cross_config, task_config):
-        pass
+        super(AVTrans, self).__init__(audio_config, visual_config, cross_config, task_config)
+        self.task_config = task_config
+        self.ignore_video_index = -1
+
+        assert self.task_config.max_frames <= visual_config.max_position_embeddings
+
+
+        # Audio Encoder ===>
+        audio_config = update_attr("audio_config", audio_config, "num_hidden_layers",
+                                    self.task_config, "audio_num_hidden_layers")
+        self.visual = AudioModel(audio_config)
+        audio_word_embeddings_weight = self.audio.embeddings.word_embeddings.weight
+        # <=== End of Video Encoder
+
+        # Video Encoder ===>
+        visual_config = update_attr("visual_config", visual_config, "num_hidden_layers",
+                                    self.task_config, "visual_num_hidden_layers")
+        self.visual = VisualModel(visual_config)
+        visual_word_embeddings_weight = self.visual.embeddings.word_embeddings.weight
+        # <=== End of Video Encoder
+
+        # Cross Encoder ===>
+        cross_config = update_attr("cross_config", cross_config, "num_hidden_layers",
+                                    self.task_config, "cross_num_hidden_layers")
+        self.cross = CrossModel(cross_config)
+        # <=== End of Cross Encoder

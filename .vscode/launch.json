@@ -2,13 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: UNIVL-AV",
+            "name": "Python: UniVL-AV",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "/home/lishuai/UniVL-AV",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "cwd":"${fileDirname}"
+            "cwd":"/home/lishuai/UniVL-AV",
+            "env": {"PYTHONPATH":"/home/lishuai/UniVL-AV"},
         }
     ]
 }

@@ -33,7 +33,9 @@ def cmumosei_data_embedding(opts):
     ids = np.array(pd.read_csv(ids_path))
     ids = ids.reshape(ids.shape[0], ).tolist()
     data = []
-    for id in ids:
+    df = pd.DataFrame(columns=["audio_feature","video_feature","emotion_label"])
+    df.to_csv(opts.csv_path)
+    for id in ids[:3]:
         print("id:", id)
         wave_data, samplerate = librosa.load(os.path.join(audio_path, id + ".wav"), sr=16000)
         audioFeature = audio_Wav2Vec2(opts,wave_data)
@@ -48,13 +50,13 @@ def cmumosei_data_embedding(opts):
         videoFeature = video_resnet50(opts,video)
         audio_file = "audio/"+id+".npy"
         video_file = "video/"+id+".npy"
-        data.append([audio_file,video_file,0])
+        # data.append([audio_file,video_file,0])
         audioFeaturePath = os.path.join(opts.feature_path,audio_file)
         videoFeaturePath = os.path.join(opts.feature_path,video_file)
         np.save(audioFeaturePath,audioFeature)
         np.save(videoFeaturePath,videoFeature)
-    df = pd.DataFrame(data,columns=["audio_feature","video_feature","emotion_label"])
-    df.to_csv(opts.csv_path,)
+        df = pd.DataFrame([audio_file,video_file,0])
+        df.to_csv(opts.csv_path,index=False, header=False)
     print("cmumosei_data_embedding done")
 if __name__=="__main__":
     args = get_args()

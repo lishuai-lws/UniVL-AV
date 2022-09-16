@@ -235,8 +235,6 @@ def dataloader_pretrain(args, tokenizer, only_sim=False):
         features_path=args.features_path,
         feature_framerate=args.feature_framerate,
         max_frames=args.max_frame,
-
-
     )
 
     sampler = torch.utils.data.distributed.DistributedSampler(cmumosei_dataset)

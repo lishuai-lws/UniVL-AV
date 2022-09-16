@@ -2,6 +2,11 @@ from torch import nn
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 from transformers import AutoFeatureExtractor, ResNetModel, ResNetForImageClassification
 import torch
+from transformers import logging
+
+#修改告警显示级别
+logging.set_verbosity_warning()
+
 
 class AudioWav2Vec2(nn.Module):
     def __init__(self,modelpath):
