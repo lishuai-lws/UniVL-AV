@@ -7,10 +7,6 @@ import numpy as np
 from PIL import Image
 # import cv2
 
-
-
-
-
 def get_args(description='data embedding'):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--wav2vec2_base_960h", default="/home/lishuai/pretrainedmodel/wav2vec2-base-960h", help="pretrained wav2vect2.0 path")
